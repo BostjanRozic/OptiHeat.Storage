@@ -14,6 +14,6 @@ public class User
     @Id
     public String id;
 
-    @Relationship(type = "UNIT", direction = Relationship.UNDIRECTED)
+    @Relationship(type = "USER_UNITS", direction = Relationship.OUTGOING)
     public Set<Unit> units;
 }

@@ -26,6 +26,14 @@ public class UserService implements IUserService
         userRepository.deleteAll();
     }
 
+    @Transactional(readOnly = false)
+    public void deleteUser(String userId)
+    {
+        userRepository.deleteAllRoomsForUser(userId);
+        userRepository.deleteAllUnitsForUser(userId);
+        userRepository.deleteUser(userId);
+    }
+
     public User getUser(String id)
     {
         return userRepository.findById(id);
