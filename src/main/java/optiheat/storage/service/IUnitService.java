@@ -4,6 +4,7 @@ import optiheat.storage.model.Unit;
 
 public interface IUnitService
 {
-    void deleteAll();
-    Unit getUnit(String id);
+    void createUnit(String userId, Unit unit) throws Exception;
+    void deleteUnit(String unitId);
+    Unit getUnit(String unitId);
 }

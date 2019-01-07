@@ -1,7 +1,9 @@
 package optiheat.storage.service;
 
 import optiheat.storage.model.Unit;
+import optiheat.storage.model.User;
 import optiheat.storage.repository.UnitRepository;
+import optiheat.storage.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,15 +11,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class UnitService implements IUnitService
 {
     private final UnitRepository unitRepository;
-    public UnitService(UnitRepository unitRepository)
+    private final UserRepository userRepository;
+    public UnitService(UnitRepository unitRepository, UserRepository userRepository)
     {
         this.unitRepository = unitRepository;
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    @Transactional
+    public void createUnit(String userId, Unit unit) throws Exception
+    {
+        User user = userRepository.findById(userId);
+        if (user == null)
+            throw new Exception ("User with id: " + userId + " does not exist in database");
+        unit.user = user;
+        unitRepository.save(unit);
     }
 
     @Transactional(readOnly = false)
-    public void deleteAll()
+    public void deleteUnit(String unitId)
     {
-        unitRepository.deleteAll();
+        unitRepository.deleteRoomsForUnit(unitId);
+        unitRepository.deleteUnit(unitId);
     }
 
     @Override
