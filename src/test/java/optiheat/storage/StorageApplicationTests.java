@@ -3,6 +3,7 @@ package optiheat.storage;
 import optiheat.storage.model.Room;
 import optiheat.storage.model.Unit;
 import optiheat.storage.model.User;
+import optiheat.storage.service.GenericService;
 import optiheat.storage.service.UnitService;
 import optiheat.storage.service.UserService;
 import org.junit.Test;
@@ -26,11 +27,13 @@ public class StorageApplicationTests
 	@Autowired
 	UnitService unitService;
 
+	@Autowired
+	GenericService genericService;
+
 	@Test
 	public void contextLoads()
 	{
-		userService.deleteAll();
-		unitService.deleteAll();
+		genericService.deleteEntireDatabase();
 
 		String id1 = UUID.randomUUID().toString();
 		String id2 = UUID.randomUUID().toString();
