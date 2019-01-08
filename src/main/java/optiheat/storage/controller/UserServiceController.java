@@ -11,10 +11,16 @@ public class UserServiceController
     @Autowired
     UserService userService;
 
-    @RequestMapping(value = "/getUsr", method = RequestMethod.POST)
+    @RequestMapping(value = "/Storage/UserService/getUser", method = RequestMethod.GET)
     @ResponseBody
-    public User getUser(@RequestBody String userId)
+    public User getUser(String userId)
     {
         return userService.getUser(userId);
+    }
+
+    @RequestMapping(value = "/Storage/UserService/createUser", method = RequestMethod.POST)
+    public void createUser(@RequestBody User user)
+    {
+        userService.createUser(user);
     }
 }

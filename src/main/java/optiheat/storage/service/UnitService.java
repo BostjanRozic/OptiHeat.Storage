@@ -20,11 +20,11 @@ public class UnitService implements IUnitService
 
     @Override
     @Transactional
-    public void createUnit(String userId, Unit unit) throws Exception
+    public void createUnit(Unit unit) throws Exception
     {
-        User user = userRepository.findById(userId);
+        User user = userRepository.findById(unit.user.id);
         if (user == null)
-            throw new Exception ("User with id: " + userId + " does not exist in database");
+            throw new Exception ("User with id: " + unit.user.id + " does not exist in database");
         unit.user = user;
         unitRepository.save(unit);
     }
