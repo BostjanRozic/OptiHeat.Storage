@@ -1,5 +1,7 @@
 package optiheat.storage;
 
+import optiheat.storage.controller.exception.BadRequestException;
+import optiheat.storage.model.User;
 import optiheat.storage.repository.UserRepository;
 import optiheat.storage.service.UserService;
 import org.junit.Before;
@@ -7,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
@@ -47,6 +54,70 @@ public class ServiceTests
     public void testUserService()
     {
         //--------> 1. createUser
+        // 1: User does not exist in DB. Id empty. Expecting status 400 (Bad Request)
+        Boolean badRequestExceptionThrown = false;
+        try
+        {
+            userServiceMock.createUser(new User());
+        }
+        catch (BadRequestException ex)
+        {
+            badRequestExceptionThrown = true;
+        }
+        assertTrue(badRequestExceptionThrown);
 
+        // 2: User does not exist in DB. GRAPH payload. Expecting status 400 (Bad Request)
+        User user = mockDataPool.users.get(0);
+        badRequestExceptionThrown = false;
+        try
+        {
+            userServiceMock.createUser(user);
+        }
+        catch (BadRequestException ex)
+        {
+            badRequestExceptionThrown = true;
+        }
+        assertTrue(badRequestExceptionThrown);
+
+        // 3: User does not exist in DB. FLAT payload. Expecting user To be created in DB
+        user.units = null;
+        when(userRepositoryMock.save(user)).thenReturn(user);
+        userServiceMock.createUser(user);
+
+        // 4: User Exists in DB. Expecting status 400 (Bad Request)
+        badRequestExceptionThrown = false;
+        try
+        {
+            userServiceMock.createUser(user);
+        }
+        catch (BadRequestException ex)
+        {
+            badRequestExceptionThrown = true;
+        }
+        assertTrue(badRequestExceptionThrown);
+
+        //----------> 2. getUser
+        // 1: Request with empty argument. Expecting status 400 (Bad Request)
+        badRequestExceptionThrown = false;
+        try
+        {
+            userServiceMock.getUser(null);
+        }
+        catch (BadRequestException ex)
+        {
+            badRequestExceptionThrown = true;
+        }
+        assertTrue(badRequestExceptionThrown);
+
+        // 2: User does not exist in DB. Expecting null.
+        String id = UUID.randomUUID().toString();
+        when(userRepositoryMock.findById(id)).thenReturn(null);
+        assertEquals(null, userServiceMock.getUser(id));
+
+        // 3: User exists in DB. Expecting FLAT payload as a result
+        User user_FLAT = mockDataPool.users.get(0);
+        user_FLAT.units = null;
+        when(userRepositoryMock.findById(mockDataPool.users.get(0).id)).thenReturn(user_FLAT);
+        assertEquals(user_FLAT, userServiceMock.getUser(mockDataPool.users.get(0).id));
     }
 }

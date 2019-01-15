@@ -26,10 +26,16 @@ public class UserService implements IUserService
     @Transactional(readOnly = false)
     public void createUser(User user)
     {
+        // Verify pre-conditions
         if (user == null)
             throw new BadRequestException("Empty Payload");
+        if (user.id == null)
+            throw new BadRequestException("user.Id is Empty");
         if (user.units != null)
             throw new BadRequestException("Payload is expected to be FLAT");
+        if (userRepository.findById(user.id) != null)
+            throw new BadRequestException("User with id: " + user.id + " already exists in DB");
+
         userRepository.save(user);
     }
 
@@ -47,8 +53,11 @@ public class UserService implements IUserService
         userRepository.deleteUser(userId);
     }
 
-    public User getUser(String id)
+    public User getUser(String userId)
     {
-        return userRepository.findById(id);
+        if (userId == null)
+            throw new BadRequestException("user.Id is Empty");
+
+        return userRepository.findById(userId);
     }
 }
