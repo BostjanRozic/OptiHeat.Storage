@@ -7,12 +7,14 @@ public class RoomSetting
 {
     @Id
     public String id;
-    public Double t_setPoint;
+    public Double t_Setpoint;
     public Double valveLevel;
 
-    @Relationship(type = "ROOM_ROOMMEASUREMENT", direction = Relationship.UNDIRECTED)
+    @Relationship(type = "ROOM_ROOMSETTINGS", direction = Relationship.UNDIRECTED)
     public Room room;
 
-    @Relationship(type = "ITERATION_ROOMMEASUREMENT", direction = Relationship.UNDIRECTED)
+    @Relationship(type = "ITERATION_ROOMSETTINGS", direction = Relationship.UNDIRECTED)
     public Iteration iteration;
+
+
 }

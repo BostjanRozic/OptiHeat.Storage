@@ -10,9 +10,9 @@ public class RoomMeasurement
     public String id;
     public Double t;
 
-    @Relationship(type = "ROOM_ROOMMEASUREMENT", direction = Relationship.UNDIRECTED)
+    @Relationship(type = "ROOM_ROOMMEASUREMENTS", direction = Relationship.UNDIRECTED)
     public Room room;
 
-    @Relationship(type = "ITERATION_ROOMMEASUREMENT", direction = Relationship.UNDIRECTED)
+    @Relationship(type = "ITERATION_ROOMMEASUREMENTS", direction = Relationship.UNDIRECTED)
     public Iteration iteration;
 }

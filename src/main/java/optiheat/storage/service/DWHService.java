@@ -5,10 +5,10 @@ import optiheat.storage.repository.IterationRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class IterationService implements IIterationService
+public class DWHService implements IDWHService
 {
     private final IterationRepository iterationRepository;
-    public IterationService(IterationRepository iterationRepository)
+    public DWHService(IterationRepository iterationRepository)
     {
         this.iterationRepository = iterationRepository;
     }

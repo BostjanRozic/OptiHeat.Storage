@@ -1,0 +1,64 @@
+{
+  "unit": {
+    "id": "818f2d1a-59d4-4054-8d20-f58d23c6f63d",
+    "name": "Azmanova"
+  },
+  "sequence": 0,
+  "roomMeasurements": [
+    {
+      "room": {
+        "id": "084d5753-ecf9-4264-9cd8-32fc355acdf6",
+        "name": "dnevna soba"
+      },
+      "t": 20.0
+    },
+    {
+      "room": {
+        "id": "235d66d1-00f1-4146-b83c-024005ee7025",
+        "name": "spalnica"
+      },
+      "t": 20.0
+    },
+    {
+      "room": {
+        "id": "e146a06d-3fa4-4c34-8d2e-88b62a1b1ff3",
+        "name": "otroska soba"
+      },
+      "t": 20.0
+    }
+  ],
+  "roomSettings": [
+    {
+      "room": {
+        "id": "084d5753-ecf9-4264-9cd8-32fc355acdf6",
+        "name": "dnevna soba"
+      },
+      "t_Setpoint": 21.5,
+      "valveLevel": 50
+    },
+    {
+      "room": {
+        "id": "235d66d1-00f1-4146-b83c-024005ee7025",
+        "name": "spalnica"
+      },
+      "t_Setpoint": 20.0,
+      "valveLevel": 70
+    },
+    {
+      "room": {
+        "id": "e146a06d-3fa4-4c34-8d2e-88b62a1b1ff3",
+        "name": "otroska soba"
+      },
+      "t_Setpoint": 20.5,
+      "valveLevel": 100
+    }
+  ],
+  "unitMeasurement": {
+    "t_Out": 10.7,
+    "t_Heat": 28.0
+  },
+  "unitSetting": {
+    "t_min": 22,
+    "t_max": 42
+  }
+}

@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class UnitService implements IUnitService
+public class SpecificationService implements ISpecificationService
 {
     private final UnitRepository unitRepository;
     private final UserRepository userRepository;
-    public UnitService(UnitRepository unitRepository, UserRepository userRepository)
+    public SpecificationService(UnitRepository unitRepository, UserRepository userRepository)
     {
         this.unitRepository = unitRepository;
         this.userRepository = userRepository;

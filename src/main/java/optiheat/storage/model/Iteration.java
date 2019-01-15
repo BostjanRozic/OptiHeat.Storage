@@ -19,7 +19,7 @@ public class Iteration
     @Relationship(type = "ITERATION_ROOMMEASUREMENTS", direction = Relationship.UNDIRECTED)
     public Set<RoomMeasurement> roomMeasurements;
 
-    @Relationship(type = "ITERATION_ROOMSETTING", direction = Relationship.UNDIRECTED)
+    @Relationship(type = "ITERATION_ROOMSETTINGS", direction = Relationship.UNDIRECTED)
     public Set<RoomSetting> roomSettings;
 
     @Relationship(type = "ITERATION_UNITMEASUREMENT", direction = Relationship.UNDIRECTED)

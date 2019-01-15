@@ -4,13 +4,12 @@ import optiheat.storage.model.Room;
 import optiheat.storage.model.Unit;
 import optiheat.storage.model.User;
 import optiheat.storage.service.GenericService;
-import optiheat.storage.service.UnitService;
+import optiheat.storage.service.SpecificationService;
 import optiheat.storage.service.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.HashSet;
@@ -25,7 +24,7 @@ public class StorageApplicationTests
 	UserService userService;
 
 	@Autowired
-	UnitService unitService;
+	SpecificationService specificationService;
 
 	@Autowired
 	GenericService genericService;
@@ -56,11 +55,11 @@ public class StorageApplicationTests
 		user1.units.add(unit1);
 		userService.createUser(user1);
 		User user = userService.getUser(id1);
-		Unit unit = unitService.getUnit(id2);
+		Unit unit = specificationService.getUnit(id2);
 		//userService.deleteAll();
 		userService.deleteUser(id1);
 		user = userService.getUser(id1);
-		unit = unitService.getUnit(id2);
+		unit = specificationService.getUnit(id2);
 		int a = 1;
 	}
 

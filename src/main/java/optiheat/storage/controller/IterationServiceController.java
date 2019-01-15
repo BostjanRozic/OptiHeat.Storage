@@ -1,7 +1,7 @@
 package optiheat.storage.controller;
 
 import optiheat.storage.model.Iteration;
-import optiheat.storage.service.IterationService;
+import optiheat.storage.service.DWHService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class IterationServiceController
 {
     @Autowired
-    IterationService iterationService;
+    DWHService DWHService;
 
-    @RequestMapping(value = "/Storage/IterationService/createIteration", method = RequestMethod.POST)
+    @RequestMapping(value = "/Storage/DWHService/createIteration", method = RequestMethod.POST)
     public void createIteration(@RequestBody Iteration iteration) throws Exception
     {
-        iterationService.createIteration(iteration);
+        DWHService.createIteration(iteration);
     }
 }

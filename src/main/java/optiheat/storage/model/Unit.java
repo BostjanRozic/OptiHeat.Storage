@@ -17,4 +17,13 @@ public class Unit
 
     @Relationship(type = "UNIT_ROOMS", direction = Relationship.UNDIRECTED)
     public Set<Room> rooms;
+
+    @Relationship(type = "UNIT_UNITMEASUREMENTS", direction = Relationship.UNDIRECTED)
+    public Set<UnitMeasurement> unitMeasurements;
+
+    @Relationship(type = "UNIT_UNITSETTINGS", direction = Relationship.UNDIRECTED)
+    public Set<UnitSetting> unitSettings;
+
+    @Relationship(type = "UNIT_ITERATIONS", direction = Relationship.UNDIRECTED)
+    public Set<Iteration> iterations;
 }

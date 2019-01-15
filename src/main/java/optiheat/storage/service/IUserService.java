@@ -6,6 +6,5 @@ public interface IUserService
 {
     void createUser(User user);
     void deleteUser(String userId);
-    void deleteAll();
     User getUser(String id);
 }
