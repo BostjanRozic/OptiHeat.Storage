@@ -1,6 +1,7 @@
 package optiheat.storage.service;
 
 import optiheat.storage.controller.exception.BadRequestException;
+import optiheat.storage.controller.exception.InternalServerErrorException;
 import optiheat.storage.model.User;
 import optiheat.storage.repository.UserRepository;
 
@@ -25,7 +26,7 @@ public class UserService implements IUserService
         this.userId = userId;
     }
 
-    //@Transactional(readOnly = false)
+    @Transactional(readOnly = false)
     public void createUser(User user)
     {
         // Verify pre-conditions
@@ -50,6 +51,12 @@ public class UserService implements IUserService
     @Transactional(readOnly = false)
     public void deleteUser(String userId)
     {
+        // Verify pre-conditions
+        if (userId == null)
+            throw new BadRequestException("user.Id is Empty");
+        if (getUser(userId) == null)
+            throw new InternalServerErrorException("User with ID: " +  userId + " could not be deleted because it was not found in the database");
+
         userRepository.deleteAllRoomsForUser(userId);
         userRepository.deleteAllUnitsForUser(userId);
         userRepository.deleteUser(userId);

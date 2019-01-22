@@ -1,6 +1,7 @@
 package optiheat.storage;
 
 import optiheat.storage.controller.exception.BadRequestException;
+import optiheat.storage.controller.exception.InternalServerErrorException;
 import optiheat.storage.model.User;
 import optiheat.storage.repository.UserRepository;
 import optiheat.storage.service.UserService;
@@ -127,5 +128,41 @@ public class ServiceTests
         assertEquals(user_FLAT, userServiceMock.getUser(user_FLAT.id));
 
         //----------> 3. deleteUser
+        // 1: Request with empty argument. Expecting status 400 (Bad Request)
+        badRequestExceptionThrown = false;
+        try
+        {
+            userServiceMock.deleteUser(null);
+        }
+        catch (BadRequestException ex)
+        {
+            badRequestExceptionThrown = true;
+        }
+        assertTrue(badRequestExceptionThrown);
+
+        // 2: User does not exist in DB. Expecting status 500 (Internal Server Error)
+        String randomId = UUID.randomUUID().toString();
+        when(userRepositoryMock.findById(randomId)).thenReturn(null);
+        Boolean internalServerErrorExceptionThrown = false;
+        try
+        {
+            userServiceMock.deleteUser(UUID.randomUUID().toString());
+        }
+        catch (InternalServerErrorException ex)
+        {
+            internalServerErrorExceptionThrown = true;
+        }
+        assertTrue(internalServerErrorExceptionThrown);
+
+        // 3: User that exists in DB. Expecting no meaningful response
+        when(userRepositoryMock.findById(mockDataPool.users.get(0).id)).thenReturn(mockDataPool.users.get(0));
+        Mockito.doNothing().when(userRepositoryMock).deleteUser(mockDataPool.users.get(0).id);
+        Mockito.doNothing().when(userRepositoryMock).deleteAllUnitsForUser(mockDataPool.users.get(0).id);
+        Mockito.doNothing().when(userRepositoryMock).deleteAllRoomsForUser(mockDataPool.users.get(0).id);
+        userServiceMock.deleteUser(mockDataPool.users.get(0).id);
+
+        //---------> 4. delete all users. Expect no meaningfull response
+        Mockito.doNothing().when(userRepositoryMock).deleteAll();
+        userServiceMock.deleteAll();
     }
 }
