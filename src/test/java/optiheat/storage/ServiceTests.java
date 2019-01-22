@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,20 +22,15 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
 public class ServiceTests
 {
     Logger logger = LoggerFactory.getLogger(UserService.class);
     MockData mockDataPool;
 
-    @Mock
-    UserRepository userRepositoryMock;
-
-    @Autowired
-    @InjectMocks
-    UserService userServiceMock;
 
     @Before
     public void setData()
@@ -43,12 +39,20 @@ public class ServiceTests
         {
             mockDataPool = new MockData();
             mockDataPool.populateMockDataFromFiles(UUID.randomUUID().toString());
+            //initMocks(this);
         }
         catch (Exception ex)
         {
             logger.error("Could not read mock data from files!", ex);
         }
     }
+
+    @Mock
+    UserRepository userRepositoryMock;
+
+    @Autowired
+    @InjectMocks
+    UserService userServiceMock;
 
     @Test
     public void testUserService()
@@ -82,10 +86,12 @@ public class ServiceTests
         // 3: User does not exist in DB. FLAT payload. Expecting user To be created in DB
         user.units = null;
         when(userRepositoryMock.save(user)).thenReturn(user);
+        when(userRepositoryMock.findById(user.id)).thenReturn(null);
         userServiceMock.createUser(user);
 
         // 4: User Exists in DB. Expecting status 400 (Bad Request)
         badRequestExceptionThrown = false;
+        when(userRepositoryMock.findById(user.id)).thenReturn(user);
         try
         {
             userServiceMock.createUser(user);
@@ -117,7 +123,9 @@ public class ServiceTests
         // 3: User exists in DB. Expecting FLAT payload as a result
         User user_FLAT = mockDataPool.users.get(0);
         user_FLAT.units = null;
-        when(userRepositoryMock.findById(mockDataPool.users.get(0).id)).thenReturn(user_FLAT);
-        assertEquals(user_FLAT, userServiceMock.getUser(mockDataPool.users.get(0).id));
+        when(userRepositoryMock.findById(user_FLAT.id)).thenReturn(user_FLAT);
+        assertEquals(user_FLAT, userServiceMock.getUser(user_FLAT.id));
+
+        //----------> 3. deleteUser
     }
 }

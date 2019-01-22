@@ -4,6 +4,7 @@ import optiheat.storage.controller.exception.BadRequestException;
 import optiheat.storage.model.User;
 import optiheat.storage.repository.UserRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,18 +13,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService implements IUserService
 {
     private String userId;
-    private final UserRepository userRepository;
-    public UserService(UserRepository userRepository)
+    @Autowired
+    private UserRepository userRepository;
+    /*public UserService(UserRepository userRepository)
     {
         this.userRepository = userRepository;
-    }
+    }*/
 
     public void setUser(String userId)
     {
         this.userId = userId;
     }
 
-    @Transactional(readOnly = false)
+    //@Transactional(readOnly = false)
     public void createUser(User user)
     {
         // Verify pre-conditions
