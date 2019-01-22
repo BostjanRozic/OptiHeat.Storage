@@ -23,4 +23,10 @@ public class UserServiceController
     {
         userService.createUser(user);
     }
+
+    @RequestMapping(value = "/addRoom", method = RequestMethod.POST)
+    public @ResponseBody void createUser()
+    {
+        int a = 1;
+    }
 }
