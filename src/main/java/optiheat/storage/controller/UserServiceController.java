@@ -11,22 +11,23 @@ public class UserServiceController
     @Autowired
     UserService userService;
 
-    @RequestMapping(value = "/Storage/UserService/getUser", method = RequestMethod.GET)
-    @ResponseBody
-    public User getUser(String userId)
-    {
-        return userService.getUser(userId);
-    }
-
     @RequestMapping(value = "/Storage/UserService/createUser", method = RequestMethod.POST)
     public void createUser(@RequestBody User user)
     {
         userService.createUser(user);
     }
 
-    @RequestMapping(value = "/addRoom", method = RequestMethod.POST)
-    public @ResponseBody void createUser()
+    @RequestMapping(value = "/Storage/UserService/deleteUser", method = RequestMethod.DELETE)
+    @ResponseBody
+    public void deleteUser(@RequestParam("userId") String userId)
     {
-        int a = 1;
+        userService.deleteUser(userId);
+    }
+
+    @RequestMapping(value = "/Storage/UserService/getUser", method = RequestMethod.GET)
+    @ResponseBody
+    public User getUser(@RequestParam("userId") String userId)
+    {
+        return userService.getUser(userId);
     }
 }

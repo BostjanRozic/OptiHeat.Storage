@@ -1,7 +1,9 @@
 package optiheat.storage;
 
 import optiheat.storage.controller.exception.BadRequestException;
+import optiheat.storage.controller.exception.ConflictException;
 import optiheat.storage.controller.exception.InternalServerErrorException;
+import optiheat.storage.controller.exception.NotFoundException;
 import optiheat.storage.model.User;
 import optiheat.storage.repository.UserRepository;
 import optiheat.storage.service.UserService;
@@ -91,17 +93,17 @@ public class ServiceTests
         userServiceMock.createUser(user);
 
         // 4: User Exists in DB. Expecting status 400 (Bad Request)
-        badRequestExceptionThrown = false;
+        Boolean conflictExceptionThrown = false;
         when(userRepositoryMock.findById(user.id)).thenReturn(user);
         try
         {
             userServiceMock.createUser(user);
         }
-        catch (BadRequestException ex)
+        catch (ConflictException ex)
         {
-            badRequestExceptionThrown = true;
+            conflictExceptionThrown = true;
         }
-        assertTrue(badRequestExceptionThrown);
+        assertTrue(conflictExceptionThrown);
 
         //----------> 2. getUser
         // 1: Request with empty argument. Expecting status 400 (Bad Request)
@@ -142,17 +144,17 @@ public class ServiceTests
 
         // 2: User does not exist in DB. Expecting status 500 (Internal Server Error)
         String randomId = UUID.randomUUID().toString();
-        when(userRepositoryMock.findById(randomId)).thenReturn(null);
-        Boolean internalServerErrorExceptionThrown = false;
+        //when(userRepositoryMock.findById(randomId)).thenReturn(null);
+        Boolean notFoundExceptionThrown = false;
         try
         {
             userServiceMock.deleteUser(UUID.randomUUID().toString());
         }
-        catch (InternalServerErrorException ex)
+        catch (NotFoundException ex)
         {
-            internalServerErrorExceptionThrown = true;
+            notFoundExceptionThrown = true;
         }
-        assertTrue(internalServerErrorExceptionThrown);
+        assertTrue(notFoundExceptionThrown);
 
         // 3: User that exists in DB. Expecting no meaningful response
         when(userRepositoryMock.findById(mockDataPool.users.get(0).id)).thenReturn(mockDataPool.users.get(0));
