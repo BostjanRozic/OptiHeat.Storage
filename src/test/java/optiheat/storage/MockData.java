@@ -76,18 +76,16 @@ public class MockData
         newRoom.unit = new Unit();
         newRoom.unit.id = room.unit.id;
         newRoom.roomSettings = new ArrayList<>();
-        for (RoomSetting rs : room.roomSettings)
-        {
-            RoomSetting newRs = new RoomSetting();
-            newRs.id = rs.id;
-            newRs.t_Setpoint = rs.t_Setpoint;
-            newRs.valveLevel = rs.valveLevel;
-            newRs.iteration = new Iteration();
-            newRs.iteration.id = rs.iteration.id;
-            newRs.iteration.datetime = rs.iteration.datetime;
-            newRs.iteration.sequence = rs.iteration.sequence;
-            newRoom.roomSettings.add(newRs);
-        }
+        RoomSetting rs = room.roomSettings.get(0);
+        RoomSetting newRs = new RoomSetting();
+        newRs.id = rs.id;
+        newRs.t_Setpoint = rs.t_Setpoint;
+        newRs.valveLevel = rs.valveLevel;
+        newRs.iteration = new Iteration();
+        newRs.iteration.id = rs.iteration.id;
+        newRs.iteration.datetime = rs.iteration.datetime;
+        newRs.iteration.sequence = rs.iteration.sequence;
+        newRoom.roomSettings.add(newRs);
 
         return newRoom;
     }

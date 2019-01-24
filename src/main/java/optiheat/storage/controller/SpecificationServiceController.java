@@ -1,5 +1,6 @@
 package optiheat.storage.controller;
 
+import optiheat.storage.model.ObjectFactory;
 import optiheat.storage.model.Room;
 import optiheat.storage.model.Unit;
 import optiheat.storage.model.User;
@@ -55,7 +56,8 @@ public class SpecificationServiceController
     @ResponseBody
     public Unit getUnit(@RequestParam("unitId") String unitId)
     {
-        return specificationService.getUnit(unitId);
+        Unit unit = specificationService.getUnit(unitId);
+        return ObjectFactory.createDirectedGraph(unit);
     }
 
     @RequestMapping(value = "/Storage/SpecificationService/getRoom", method = RequestMethod.GET)

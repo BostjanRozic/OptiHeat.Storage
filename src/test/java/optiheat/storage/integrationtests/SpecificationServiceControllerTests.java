@@ -89,7 +89,9 @@ public class SpecificationServiceControllerTests
         result = mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
         result = mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
         Assert.assertNull(result.andReturn().getResolvedException());
-        Unit unitInDB = unitRepository.findById(mockUnit.id);
+        result = mvc.perform(get("/Storage/SpecificationService/getUnit").param("unitId", mockUnit.id).contentType(MediaType.TEXT_PLAIN));
+        Unit unitInDB = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), Unit.class);
+        //Unit unitInDB = unitRepository.findById(mockUnit.id);
         Assert.assertEquals(mockUnit.id, unitInDB.id);
 
         // 3: conflict - unit already exists
@@ -102,6 +104,7 @@ public class SpecificationServiceControllerTests
     public void createRoomTest() throws Exception
     {
         Room mockRoom = mockDataPool.copyRoomDirected(mockDataPool.users.get(0).units.get(0).rooms.get(0));
+        // 1: notfound
     }
 
 

@@ -3,9 +3,7 @@ package optiheat.storage.service;
 import optiheat.storage.controller.exception.BadRequestException;
 import optiheat.storage.controller.exception.ConflictException;
 import optiheat.storage.controller.exception.NotFoundException;
-import optiheat.storage.model.Room;
-import optiheat.storage.model.Unit;
-import optiheat.storage.model.User;
+import optiheat.storage.model.*;
 import optiheat.storage.repository.RoomRepository;
 import optiheat.storage.repository.UnitRepository;
 import optiheat.storage.repository.UserRepository;
@@ -141,6 +139,15 @@ public class SpecificationService implements ISpecificationService
 
     public Unit getUnit(String unitId)
     {
+        Unit unit = unitRepository.findById(unitId);
+        for (Room room : unit.rooms)
+        {
+            room.roomSettings = roomRepository.findById(room.id).roomSettings;
+            for (RoomSetting roomSetting : room.roomSettings)
+            {
+
+            }
+        }
         return unitRepository.findById(unitId);
     }
 
