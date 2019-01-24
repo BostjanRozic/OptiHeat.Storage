@@ -5,9 +5,7 @@ import com.google.gson.stream.JsonReader;
 import optiheat.storage.model.*;
 import org.apache.poi.ss.usermodel.*;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -38,10 +36,60 @@ public class MockData
         User user = new User();
         user.id = userId;
         if (user.units == null)
-            user.units = new HashSet<>();
+            user.units = new ArrayList<>();
         user.units.add(unit);
         unit.user = user;
         users.add(user);
+    }
+
+    public static Unit copyUnitDirected(Unit unit)
+    {
+        Unit newUnit = new Unit();
+        newUnit.id = unit.id;
+        newUnit.name = unit.name;
+        newUnit.user = new User();
+        newUnit.user.id = unit.user.id;
+        newUnit.unitSettings = new ArrayList<>();
+        UnitSetting newUs = new UnitSetting();
+        newUs.id = unit.unitSettings.get(0).id;
+        newUs.t_max = unit.unitSettings.get(0).t_max;
+        newUs.t_min = unit.unitSettings.get(0).t_min;
+        newUs.iteration = new Iteration();
+        newUs.iteration.id = unit.unitSettings.get(0).iteration.id;
+        newUs.iteration.sequence = unit.unitSettings.get(0).iteration.sequence;
+        newUs.iteration.datetime = unit.unitSettings.get(0).iteration.datetime;
+        newUnit.unitSettings.add(newUs);
+        newUnit.rooms = new ArrayList<>();
+        for (Room room : unit.rooms)
+        {
+            newUnit.rooms.add(copyRoomDirected(room));
+        }
+
+        return newUnit;
+    }
+
+    public static Room copyRoomDirected(Room room)
+    {
+        Room newRoom = new Room();
+        newRoom.id = room.id;
+        newRoom.name = room.name;
+        newRoom.unit = new Unit();
+        newRoom.unit.id = room.unit.id;
+        newRoom.roomSettings = new ArrayList<>();
+        for (RoomSetting rs : room.roomSettings)
+        {
+            RoomSetting newRs = new RoomSetting();
+            newRs.id = rs.id;
+            newRs.t_Setpoint = rs.t_Setpoint;
+            newRs.valveLevel = rs.valveLevel;
+            newRs.iteration = new Iteration();
+            newRs.iteration.id = rs.iteration.id;
+            newRs.iteration.datetime = rs.iteration.datetime;
+            newRs.iteration.sequence = rs.iteration.sequence;
+            newRoom.roomSettings.add(newRs);
+        }
+
+        return newRoom;
     }
 
     public static User getUser(String userId)
@@ -73,13 +121,14 @@ public class MockData
         {
             for (RoomMeasurement roomMeasurement : iteration.roomMeasurements)
             {
+                roomMeasurement.id = UUID.randomUUID().toString();
                 Room correspondingRoom = unit.rooms.stream().filter(x -> x.id.equals(roomMeasurement.room.id)).findFirst().get();
                 if (correspondingRoom.roomMeasurements == null)
-                    correspondingRoom.roomMeasurements = new HashSet<>();
+                    correspondingRoom.roomMeasurements = new ArrayList<>();
                 correspondingRoom.roomMeasurements.add(roomMeasurement);
                 roomMeasurement.room = correspondingRoom;
                 if (newIteration.roomMeasurements == null)
-                    newIteration.roomMeasurements = new HashSet<>();
+                    newIteration.roomMeasurements = new ArrayList<>();
                 newIteration.roomMeasurements.add(roomMeasurement);
                 roomMeasurement.iteration = newIteration;
             }
@@ -89,13 +138,14 @@ public class MockData
         {
             for (RoomSetting roomSetting : iteration.roomSettings)
             {
+                roomSetting.id = UUID.randomUUID().toString();
                 Room correspondingRoom = unit.rooms.stream().filter(x -> x.id.equals(roomSetting.room.id)).findFirst().get();
                 if (correspondingRoom.roomSettings == null)
-                    correspondingRoom.roomSettings = new HashSet<>();
+                    correspondingRoom.roomSettings = new ArrayList<>();
                 correspondingRoom.roomSettings.add(roomSetting);
                 roomSetting.room = correspondingRoom;
                 if (newIteration.roomSettings == null)
-                    newIteration.roomSettings = new HashSet<>();
+                    newIteration.roomSettings = new ArrayList<>();
                 newIteration.roomSettings.add(roomSetting);
                 roomSetting.iteration = newIteration;
             }
@@ -103,8 +153,9 @@ public class MockData
 
         if (iteration.unitSetting != null)
         {
+            iteration.unitSetting.id = UUID.randomUUID().toString();
             if (unit.unitSettings == null)
-                unit.unitSettings = new HashSet<>();
+                unit.unitSettings = new ArrayList<>();
             unit.unitSettings.add(iteration.unitSetting);
             iteration.unitSetting.unit = unit;
 
@@ -114,8 +165,9 @@ public class MockData
 
         if (iteration.unitMeasurement != null)
         {
+            iteration.unitMeasurement.id = UUID.randomUUID().toString();
             if (unit.unitMeasurements == null)
-                unit.unitMeasurements = new HashSet<>();
+                unit.unitMeasurements = new ArrayList<>();
             unit.unitMeasurements.add(iteration.unitMeasurement);
             iteration.unitMeasurement.unit = unit;
 
@@ -124,7 +176,8 @@ public class MockData
         }
 
         if (unit.iterations == null)
-            unit.iterations = new HashSet<>();
+            unit.iterations = new ArrayList<>();
+        newIteration.id = UUID.randomUUID().toString();
         unit.iterations.add(newIteration);
         newIteration.unit = unit;
     }
@@ -180,7 +233,7 @@ public class MockData
                             {
                                 iteration = new Iteration();
                                 iteration.datetime = dt;
-                                iteration.roomMeasurements = new HashSet<>();
+                                iteration.roomMeasurements = new ArrayList<>();
                                 iterations.add(iteration);
                             }
                             else if (sheet.getSheetName().equals("Settings"))
@@ -224,7 +277,7 @@ public class MockData
                             else if (sheet.getSheetName().equals("Settings"))
                             {
                                 if (iteration.roomSettings == null)
-                                    iteration.roomSettings = new HashSet<>();
+                                    iteration.roomSettings = new ArrayList<>();
                                 if (columnName.contains("setpoint"))
                                 {
                                     rs = new RoomSetting();

@@ -1,14 +1,21 @@
-package optiheat.storage;
+package optiheat.storage.servicetests;
 
+import optiheat.storage.MockData;
 import optiheat.storage.controller.exception.BadRequestException;
 import optiheat.storage.controller.exception.ConflictException;
 import optiheat.storage.controller.exception.InternalServerErrorException;
 import optiheat.storage.controller.exception.NotFoundException;
+import optiheat.storage.model.Unit;
 import optiheat.storage.model.User;
+import optiheat.storage.repository.UnitRepository;
 import optiheat.storage.repository.UserRepository;
+import optiheat.storage.service.SpecificationService;
 import optiheat.storage.service.UserService;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -29,7 +36,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
-public class ServiceTests
+public class UserServiceTests
 {
     Logger logger = LoggerFactory.getLogger(UserService.class);
     MockData mockDataPool;
@@ -53,9 +60,16 @@ public class ServiceTests
     @Mock
     UserRepository userRepositoryMock;
 
+    @Mock
+    UnitRepository unitRepositoryMock;
+
     @Autowired
     @InjectMocks
     UserService userServiceMock;
+
+    @Autowired
+    @InjectMocks
+    SpecificationService specificationServiceMock;
 
     @Test
     public void testUserService()

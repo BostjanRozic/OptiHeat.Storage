@@ -4,7 +4,7 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.Relationship;
 
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 public class Iteration
 {
@@ -17,10 +17,10 @@ public class Iteration
     public Unit unit;
 
     @Relationship(type = "ITERATION_ROOMMEASUREMENTS", direction = Relationship.UNDIRECTED)
-    public Set<RoomMeasurement> roomMeasurements;
+    public List<RoomMeasurement> roomMeasurements;
 
     @Relationship(type = "ITERATION_ROOMSETTINGS", direction = Relationship.UNDIRECTED)
-    public Set<RoomSetting> roomSettings;
+    public List<RoomSetting> roomSettings;
 
     @Relationship(type = "ITERATION_UNITMEASUREMENT", direction = Relationship.UNDIRECTED)
     public UnitMeasurement unitMeasurement;

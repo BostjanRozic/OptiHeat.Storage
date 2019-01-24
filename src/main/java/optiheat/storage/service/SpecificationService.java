@@ -1,5 +1,7 @@
 package optiheat.storage.service;
 
+import optiheat.storage.controller.exception.BadRequestException;
+import optiheat.storage.controller.exception.ConflictException;
 import optiheat.storage.controller.exception.NotFoundException;
 import optiheat.storage.model.Room;
 import optiheat.storage.model.Unit;
@@ -16,17 +18,26 @@ public class SpecificationService implements ISpecificationService
 {
     @Autowired
     private RoomRepository roomRepository;
-    private final UnitRepository unitRepository;
-    private final UserRepository userRepository;
-    public SpecificationService(UnitRepository unitRepository, UserRepository userRepository)
+    @Autowired
+    private UnitRepository unitRepository;
+    @Autowired
+    private UserRepository userRepository;
+    /*public SpecificationService(UnitRepository unitRepository, UserRepository userRepository)
     {
         this.unitRepository = unitRepository;
         this.userRepository = userRepository;
-    }
+    }*/
 
     @Transactional
     public void createUnit(String userId, Unit unit)
     {
+        // payload validation
+        if (userId == null || unit == null || unit.id == null)
+            throw new BadRequestException("Invalid payload. One of the input arguments is null or missing attributes");
+
+        if (unitRepository.findById(unit.id) != null)
+            throw new ConflictException("Unit with the specified ID: " + unit.id + " already exists in DB. Will not create a new one...");
+
         User user = userRepository.findById(userId);
         if (user == null)
             throw new NotFoundException("User with id: " + userId + " does not exist in database");
@@ -38,9 +49,16 @@ public class SpecificationService implements ISpecificationService
     @Transactional
     public void createRoom(Room room)
     {
+        // payload validation
+        if (room == null || room.id == null || room.unit == null || room.unit.id == null)
+            throw new BadRequestException("Invalid payload. One of the input arguments is null or missing attributes");
+
         Unit unit = unitRepository.findById(room.unit.id);
         if (unit == null)
-            throw new NotFoundException("Unit with id: " + unit.id + " does not exist in database");
+            throw new NotFoundException("Unit with id: " + room.unit.id + " does not exist in database");
+
+        if (roomRepository.findById(room.id) != null)
+            throw new ConflictException("Room with the specified ID: " + room.id + " already exists in DB. Will not create a new one...");
 
         room.unit = unit;
         roomRepository.save(room);
@@ -49,6 +67,10 @@ public class SpecificationService implements ISpecificationService
     @Transactional
     public void updateUnit(Unit unit)
     {
+        // payload validation
+        if (unit == null || unit.id == null)
+            throw new BadRequestException("Invalid payload. One of the input arguments is null or missing attributes");
+
         Unit existingUnit = unitRepository.findById(unit.id);
         if (existingUnit == null)
             throw new NotFoundException("Unit with id: " + unit.id + " does not exist in database");
@@ -62,6 +84,10 @@ public class SpecificationService implements ISpecificationService
     @Transactional
     public void updateRoom(Room room)
     {
+        // payload validation
+        if (room == null || room.id == null)
+            throw new BadRequestException("Invalid payload. One of the input arguments is null or missing attributes");
+
         Room existingRoom = roomRepository.findById(room.id);
         if (existingRoom == null)
             throw new NotFoundException("Room with id: " + room.id + " does not exist in database");
@@ -75,6 +101,10 @@ public class SpecificationService implements ISpecificationService
     @Transactional(readOnly = false)
     public void deleteUnit(String unitId)
     {
+        // payload validation
+        if (unitId == null)
+            throw new BadRequestException("Invalid request - query argument unitId missing or null");
+
         Unit existingUnit = unitRepository.findById(unitId);
         if (existingUnit == null)
             throw new NotFoundException("Unit with id: " + unitId + " does not exist in database");
@@ -96,6 +126,10 @@ public class SpecificationService implements ISpecificationService
     @Transactional(readOnly = false)
     public void deleteRoom(String roomId)
     {
+        // payload validation
+        if (roomId == null)
+            throw new BadRequestException("Invalid request - query argument roomId missing or null");
+
         Room existingRoom = roomRepository.findById(roomId);
         if (existingRoom == null)
             throw new NotFoundException("Room with id: " + roomId + " does not exist in database");

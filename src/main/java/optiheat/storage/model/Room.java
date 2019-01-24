@@ -3,7 +3,8 @@ package optiheat.storage.model;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.Relationship;
 
-import java.util.Set;
+import java.util.List;
+
 
 public class Room
 {
@@ -15,8 +16,8 @@ public class Room
     public Unit unit;
 
     @Relationship(type = "ROOM_ROOMMEASUREMENTS", direction = Relationship.UNDIRECTED)
-    public Set<RoomMeasurement> roomMeasurements;
+    public List<RoomMeasurement> roomMeasurements;
 
     @Relationship(type = "ROOM_ROOMSETTINGS", direction = Relationship.UNDIRECTED)
-    public Set<RoomSetting> roomSettings;
+    public List<RoomSetting> roomSettings;
 }

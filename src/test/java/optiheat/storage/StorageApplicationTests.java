@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -49,9 +50,9 @@ public class StorageApplicationTests
 		room1.id = id3;
 		room1.name = "room 1";
 
-		unit1.rooms = new HashSet<>();
+		unit1.rooms = new ArrayList<>();
 		unit1.rooms.add(room1);
-		user1.units = new HashSet<>();
+		user1.units = new ArrayList<>();
 		user1.units.add(unit1);
 		userService.createUser(user1);
 		User user = userService.getUser(id1);

@@ -14,7 +14,7 @@ public class SpecificationServiceController
     SpecificationService specificationService;
 
     @RequestMapping(value = "/Storage/SpecificationService/createUnit", method = RequestMethod.POST)
-    public void createUser(@RequestBody String userId, @RequestBody Unit unit)
+    public void createUser(@RequestParam("userId") String userId, @RequestBody Unit unit)
     {
         specificationService.createUnit(userId, unit);
     }

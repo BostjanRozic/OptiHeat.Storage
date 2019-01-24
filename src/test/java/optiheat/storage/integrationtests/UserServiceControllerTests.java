@@ -1,7 +1,8 @@
-package optiheat.storage;
+package optiheat.storage.integrationtests;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import optiheat.storage.MockData;
 import optiheat.storage.controller.exception.ConflictException;
 import optiheat.storage.controller.exception.NotFoundException;
 import optiheat.storage.model.User;
@@ -22,7 +23,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.Filter;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.core.MediaType;
 
 import java.util.UUID;
@@ -32,9 +32,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-public class IntegrationTests
+public class UserServiceControllerTests
 {
-    Logger logger = LoggerFactory.getLogger(IntegrationTests.class);
+    Logger logger = LoggerFactory.getLogger(UserServiceControllerTests.class);
     MockData mockDataPool;
 
     @Before
