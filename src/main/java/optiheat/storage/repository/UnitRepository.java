@@ -28,12 +28,15 @@ public interface UnitRepository extends CrudRepository<Unit, Long>
     @Query("MATCH (r:Room)-[:UNIT_ROOMS]-(:Unit {id:{unitId}}) DETACH DELETE r")
     void deleteRoomsForUnit(String unitId);
 
-    @Query("MATCH (u:UnitMeasurement)-[:UNIT_UNITMEASUREMENTS]-(:Unit {id:{unitId}}) DELETE u")
+    @Query("MATCH (u:UnitMeasurement)--(:Unit {id:{unitId}}) DETACH DELETE u")
     void deleteAllMeasurementsForUnit(String unitId);
 
-    @Query("MATCH (u:UnitSetting)-[:UNIT_UNITSETTINGS]-(:Unit {id:{unitId}}) DELETE u")
+    @Query("MATCH (u:UnitSetting)--(:Unit {id:{unitId}}) DETACH DELETE u")
     void deleteAllSettingsForUnit(String unitId);
 
-    @Query("MATCH (u:Unit {id:{unitId}})")
+    @Query("MATCH (i:Iteration)--(:Unit {id:{unitId}}) DETACH DELETE i")
+    void deleteAllIterationsForUnit(String unitId);
+
+    @Query("MATCH (u:Unit {id:{unitId}}) DETACH DELETE u")
     void deleteUnit(String unitId);
 }

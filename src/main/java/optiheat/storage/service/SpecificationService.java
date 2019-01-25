@@ -128,6 +128,7 @@ public class SpecificationService implements ISpecificationService
 
         unitRepository.deleteAllMeasurementsForUnit(unitId);
         unitRepository.deleteAllSettingsForUnit(unitId);
+        unitRepository.deleteAllIterationsForUnit(unitId);
         unitRepository.deleteUnit(unitId);
     }
 

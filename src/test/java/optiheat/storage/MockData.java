@@ -70,6 +70,19 @@ public class MockData
                 newUnit.unitSettings.add(newUs);
             }
         }
+        if (unit.iterations != null)
+        {
+            List<Iteration> newIterations = new ArrayList<>();
+            for (Iteration iteration : unit.iterations)
+            {
+                Iteration newIteration = new Iteration();
+                newIteration.id = iteration.id;
+                newIteration.sequence = iteration.sequence;
+                newIteration.datetime = iteration.datetime;
+                newIterations.add(newIteration);
+            }
+            newUnit.iterations = newIterations;
+        }
 
 
         return newUnit;

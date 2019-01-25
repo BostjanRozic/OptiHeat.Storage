@@ -12,12 +12,12 @@ public interface RoomRepository extends CrudRepository<Room, Long>
     @Query("MATCH (r:Room {id:{roomId}}) OPTIONAL MATCH (r)-[rrs:ROOM_ROOMSETTINGS]-(rs:RoomSetting)-[irs:ITERATION_ROOMSETTINGS]-(i:Iteration) return r, rrs, rs ORDER by i.sequence DESC LIMIT 1")
     Room getRoomWithLastRoomSetting(String roomId);
 
-    @Query("MATCH (r:RoomMeasurement)-[:ROOM_ROOMMEASUREMENTS]-(:Room {id:{roomId}}) DELETE r")
+    @Query("MATCH (r:RoomMeasurement)--(:Room {id:{roomId}}) DETACH DELETE r")
     void deleteAllMeasurementsForRoom(String roomId);
 
-    @Query("MATCH (r:RoomSetting)-[:ROOM_ROOMSETTINGS]-(:Room {id:{roomId}}) DELETE r")
+    @Query("MATCH (r:RoomSetting)--(:Room {id:{roomId}}) DETACH DELETE r")
     void deleteAllSettingsForRoom(String roomId);
 
-    @Query("MATCH (r:Room {id:{roomId}}) DELETE r")
+    @Query("MATCH (r:Room {id:{roomId}}) DETACH DELETE r")
     void deleteRoom(String roomId);
 }

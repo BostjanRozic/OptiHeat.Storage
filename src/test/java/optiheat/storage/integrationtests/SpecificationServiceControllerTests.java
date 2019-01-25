@@ -200,6 +200,55 @@ public class SpecificationServiceControllerTests
     }
 
     @Test
+    public void deleteUnitTest() throws Exception
+    {
+        Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
+        ResultActions result;
+
+        // 1: not found - unit does not exist
+        genericService.deleteEntireDatabase();
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(delete("/Storage/SpecificationService/deleteUnit").param("unitId", mockUnit.id).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertNotNull(result.andReturn().getResolvedException());
+        Assert.assertEquals(NotFoundException.class, result.andReturn().getResolvedException().getClass());
+
+        // 2: unit exists, request ok
+        genericService.deleteEntireDatabase();
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
+        Unit unitInDB = unitRepository.findById(mockUnit.id);
+        Assert.assertNotNull(unitInDB);
+        result = mvc.perform(delete("/Storage/SpecificationService/deleteUnit").param("unitId", mockUnit.id).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertNull(result.andReturn().getResolvedException());
+        unitInDB = unitRepository.findById(mockUnit.id);
+        Assert.assertNull(unitInDB);
+    }
+
+    @Test
+    public void deleteRoomTest() throws Exception
+    {
+        Room mockRoom = mockDataPool.copyRoomDirected(mockDataPool.users.get(0).units.get(0).rooms.get(0));
+        Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
+        ResultActions result;
+
+        // 1: not found - room does not exist
+        genericService.deleteEntireDatabase();
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(delete("/Storage/SpecificationService/deleteRoom").param("roomId", mockRoom.id).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertNotNull(result.andReturn().getResolvedException());
+        Assert.assertEquals(NotFoundException.class, result.andReturn().getResolvedException().getClass());
+
+        // 2: request ok
+        genericService.deleteEntireDatabase();
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(delete("/Storage/SpecificationService/deleteRoom").param("roomId", mockRoom.id).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertNull(result.andReturn().getResolvedException());
+        Room roomInDB = roomRepository.findById(mockRoom.id);
+        Assert.assertNull(roomInDB);
+    }
+
+    @Test
     public void getUnitTest() throws Exception
     {
         Unit mockUnit;
@@ -210,7 +259,7 @@ public class SpecificationServiceControllerTests
         genericService.deleteEntireDatabase();
 
         // 1: Unit does not exist - reply ok, empty payload
-        result = mvc.perform(get("/Storage/SpecificationService/getUnit").param("unitId", UUID.randomUUID().toString()).contentType(MediaType.TEXT_PLAIN));
+        result = mvc.perform(get("/Storage/SpecificationService/MATCHgetUnit").param("unitId", UUID.randomUUID().toString()).contentType(MediaType.TEXT_PLAIN));
         Assert.assertEquals("",result.andReturn().getResponse().getContentAsString());
 
         // 2: Unit exists but has no Rooms and no UnitSettings
