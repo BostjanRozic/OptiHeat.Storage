@@ -22,6 +22,9 @@ public interface UnitRepository extends CrudRepository<Unit, Long>
     @Query("MATCH (u:Unit)--(:User {id:{userId}}) return u")
     List<Unit> getUnitsFlat(String userId);
 
+    @Query("MATCH (u:Unit {id:{unitId}}) SET u.name = {name}")
+    void setName(String unitId, String name);
+
     @Query("MATCH (r:Room)-[:UNIT_ROOMS]-(:Unit {id:{unitId}}) DETACH DELETE r")
     void deleteRoomsForUnit(String unitId);
 

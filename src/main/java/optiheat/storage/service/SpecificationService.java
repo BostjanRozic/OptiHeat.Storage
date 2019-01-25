@@ -85,7 +85,7 @@ public class SpecificationService implements ISpecificationService
 
         if (unit.name != null)
             existingUnit.name = unit.name;
-
+            //unitRepository.setName(unit.id, unit.name);
         unitRepository.save(existingUnit);
     }
 

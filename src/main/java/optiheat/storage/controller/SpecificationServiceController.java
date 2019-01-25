@@ -29,7 +29,7 @@ public class SpecificationServiceController
     }
 
     @RequestMapping(value = "/Storage/SpecificationService/updateUnit", method = RequestMethod.PATCH)
-    public void updateUser(@RequestBody Unit unit)
+    public void updateUnit(@RequestBody Unit unit)
     {
         specificationService.updateUnit(unit);
     }
