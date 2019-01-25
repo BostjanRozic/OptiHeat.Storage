@@ -27,4 +27,9 @@ public class Iteration
 
     @Relationship(type = "ITERATION_UNITSETTING", direction = Relationship.UNDIRECTED)
     public UnitSetting unitSetting;
+
+    public int getSequence()
+    {
+        return sequence;
+    }
 }

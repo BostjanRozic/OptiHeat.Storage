@@ -16,5 +16,8 @@ public class RoomSetting
     @Relationship(type = "ITERATION_ROOMSETTINGS", direction = Relationship.UNDIRECTED)
     public Iteration iteration;
 
-
+    public Iteration getIteration()
+    {
+        return iteration;
+    }
 }

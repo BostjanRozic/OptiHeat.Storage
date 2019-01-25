@@ -1,9 +1,9 @@
 package optiheat.storage.repository;
 
-import optiheat.storage.model.Room;
+import optiheat.storage.model.RoomSetting;
 import org.springframework.data.repository.CrudRepository;
 
-public interface RoomSettingRepository extends CrudRepository<Room, Long>
+public interface RoomSettingRepository extends CrudRepository<RoomSetting, Long>
 {
-    Room findById(String id);
+    RoomSetting findById(String id);
 }

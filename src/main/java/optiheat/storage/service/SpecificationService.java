@@ -5,17 +5,27 @@ import optiheat.storage.controller.exception.ConflictException;
 import optiheat.storage.controller.exception.NotFoundException;
 import optiheat.storage.model.*;
 import optiheat.storage.repository.RoomRepository;
+import optiheat.storage.repository.RoomSettingRepository;
 import optiheat.storage.repository.UnitRepository;
 import optiheat.storage.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 @Service
 public class SpecificationService implements ISpecificationService
 {
     @Autowired
     private RoomRepository roomRepository;
+    @Autowired
+    private RoomSettingRepository roomSettingRepository;
     @Autowired
     private UnitRepository unitRepository;
     @Autowired
@@ -137,22 +147,51 @@ public class SpecificationService implements ISpecificationService
         roomRepository.deleteRoom(roomId);
     }
 
+    /**
+     * Iz specifikacije.
+     * Payload obsega:
+     * - Unit z vsemi atributi
+     * - V relaciji zadnji veljavni UnitSetting objekt
+     * - Vsi pripadajoči Room objekti
+     * - V relaciji na vsak Room objekt pripadajoči zadnji veljavni RoomSetting objekt
+     * @param unitId
+     * @return
+     */
     public Unit getUnit(String unitId)
     {
-        Unit unit = unitRepository.findById(unitId);
-        for (Room room : unit.rooms)
-        {
-            room.roomSettings = roomRepository.findById(room.id).roomSettings;
-            for (RoomSetting roomSetting : room.roomSettings)
-            {
+        // payload validation
+        if (unitId == null)
+            throw new BadRequestException("Invalid request - query argument roomId missing or null");
 
+        //Unit unit = unitRepository.findById(unitId);
+        Unit unit = unitRepository.getUnitWithLastUnitSetting(unitId);
+        if (unit == null)
+            return null;
+
+        unit = unitRepository.getUnitWithRooms(unitId);
+        if (unit.rooms != null)
+        {
+            for (Room room : unit.rooms)
+            {
+                room = roomRepository.getRoomWithLastRoomSetting(room.id);
             }
         }
-        return unitRepository.findById(unitId);
+        return unit;
     }
 
-    public Room getRoom(String roomId)
+    /**
+     * Iz specifikacije:
+     * Payload obsega seznam vseh Unit objektov, vsak izmed njih z vsemi atributi a brez vsakršnih relacij.
+     * @param userId
+     * @return
+     */
+    public List<Unit> getUnits(String userId)
     {
-        return roomRepository.findById(roomId);
+        // payload validation
+        if (userId == null)
+            throw new BadRequestException("Invalid request - query argument roomId missing or null");
+
+        List<Unit> units = unitRepository.getUnitsFlat(userId);
+        return units;
     }
 }

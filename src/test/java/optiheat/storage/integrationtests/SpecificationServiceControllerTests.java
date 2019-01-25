@@ -5,9 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import optiheat.storage.MockData;
 import optiheat.storage.controller.exception.ConflictException;
 import optiheat.storage.controller.exception.NotFoundException;
-import optiheat.storage.model.Room;
-import optiheat.storage.model.Unit;
-import optiheat.storage.model.User;
+import optiheat.storage.model.*;
+import optiheat.storage.repository.RoomRepository;
 import optiheat.storage.repository.UnitRepository;
 import optiheat.storage.repository.UserRepository;
 import optiheat.storage.service.GenericService;
@@ -29,6 +28,8 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.Filter;
 import javax.ws.rs.core.MediaType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -66,6 +67,9 @@ public class SpecificationServiceControllerTests
     UnitRepository unitRepository;
 
     @Autowired
+    RoomRepository roomRepository;
+
+    @Autowired
     private WebApplicationContext context;
 
     @Autowired
@@ -80,6 +84,16 @@ public class SpecificationServiceControllerTests
     public void createUnitTest() throws Exception
     {
         Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
+        List<UnitSetting> allUnitSettings = mockUnit.unitSettings;
+        mockUnit.unitSettings = new ArrayList<>();
+        mockUnit.unitSettings.add(allUnitSettings.get(0));
+        for (Room room : mockUnit.rooms)
+        {
+            List<RoomSetting> allRoomSettings = room.roomSettings;
+            room.roomSettings = new ArrayList<>();
+            room.roomSettings.add(allRoomSettings.get(0));
+        }
+
         // 1: not found - user does not exist
         ResultActions result = mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
         Assert.assertNotNull(result.andReturn().getResolvedException());
@@ -89,9 +103,7 @@ public class SpecificationServiceControllerTests
         result = mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
         result = mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
         Assert.assertNull(result.andReturn().getResolvedException());
-        result = mvc.perform(get("/Storage/SpecificationService/getUnit").param("unitId", mockUnit.id).contentType(MediaType.TEXT_PLAIN));
-        Unit unitInDB = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), Unit.class);
-        //Unit unitInDB = unitRepository.findById(mockUnit.id);
+        Unit unitInDB = unitRepository.findById(mockUnit.id);
         Assert.assertEquals(mockUnit.id, unitInDB.id);
 
         // 3: conflict - unit already exists
@@ -104,9 +116,174 @@ public class SpecificationServiceControllerTests
     public void createRoomTest() throws Exception
     {
         Room mockRoom = mockDataPool.copyRoomDirected(mockDataPool.users.get(0).units.get(0).rooms.get(0));
-        // 1: notfound
+        Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
+        ResultActions result;
+        // Bad requests are not tested - Service tests are for that...
+
+        // 1: notfound - unit does not exist
+        genericService.deleteEntireDatabase();
+        result = mvc.perform(post("/Storage/SpecificationService/createRoom").content(asJsonString(mockRoom)).contentType(MediaType.APPLICATION_JSON));
+        Assert.assertNotNull(result.andReturn().getResolvedException());
+        Assert.assertEquals(NotFoundException.class, result.andReturn().getResolvedException().getClass());
+
+        // 2: conflict - room already exists
+        genericService.deleteEntireDatabase();
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(post("/Storage/SpecificationService/createRoom").content(asJsonString(mockRoom)).contentType(MediaType.APPLICATION_JSON));
+        Assert.assertNotNull(result.andReturn().getResolvedException());
+        Assert.assertEquals(ConflictException.class, result.andReturn().getResolvedException().getClass());
+
+        // 3: room doesn't exist it is sucessfully entered
+        genericService.deleteEntireDatabase();
+        mockUnit.rooms = null;
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(post("/Storage/SpecificationService/createRoom").content(asJsonString(mockRoom)).contentType(MediaType.APPLICATION_JSON));
+        Assert.assertNull(result.andReturn().getResolvedException());
+        Room roomInDB = roomRepository.findById(mockRoom.id);
+        Assert.assertNotNull(roomInDB.unit);
+        Assert.assertNotNull(roomInDB.roomSettings);
     }
 
+    @Test
+    public void getUnitTest() throws Exception
+    {
+        Unit mockUnit;
+        ResultActions result;
+        Unit unitInDB;
+
+        // Data preparation
+        genericService.deleteEntireDatabase();
+
+        // 1: Unit does not exist - reply ok, empty payload
+        result = mvc.perform(get("/Storage/SpecificationService/getUnit").param("unitId", UUID.randomUUID().toString()).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertEquals("",result.andReturn().getResponse().getContentAsString());
+
+        // 2: Unit exists but has no Rooms and no UnitSettings
+        // data preparation
+        genericService.deleteEntireDatabase();
+        mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
+        mockUnit.rooms = null;
+        mockUnit.unitSettings = null;
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
+        // test execution and result assertion
+        result = mvc.perform(get("/Storage/SpecificationService/getUnit").param("unitId", mockDataPool.users.get(0).units.get(0).id).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertNull(result.andReturn().getResolvedException());
+        unitInDB = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), Unit.class);
+        Assert.assertNotNull(unitInDB);
+        Assert.assertNull(unitInDB.rooms);
+        Assert.assertNull(unitInDB.unitSettings);
+        Assert.assertNull(unitInDB.unitMeasurements);
+        Assert.assertNull(unitInDB.iterations);
+
+
+        // 3: Unit exists and has several UnitSettings (only the last should be returned) but no Rooms
+        // data preparation
+        genericService.deleteEntireDatabase();
+        mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
+        mockUnit.rooms = null;
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
+        // test execution and result assertion
+        result = mvc.perform(get("/Storage/SpecificationService/getUnit").param("unitId", mockDataPool.users.get(0).units.get(0).id).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertNull(result.andReturn().getResolvedException());
+        unitInDB = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), Unit.class);
+        Assert.assertNotNull(unitInDB);
+        Assert.assertNotNull(unitInDB.unitSettings);
+        Assert.assertEquals(1, unitInDB.unitSettings.size());
+        Assert.assertNull(unitInDB.rooms);
+        Assert.assertNull(unitInDB.unitMeasurements);
+        Assert.assertNull(unitInDB.iterations);
+
+        // 4: Unit exists and has several UnitSettings (only the last should be returned) and several Rooms (none of them have any RoomSettings)
+        genericService.deleteEntireDatabase();
+        mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
+        for (Room room : mockUnit.rooms)
+        {
+            room.roomSettings = null;
+        }
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
+        // test execution and result assertion
+        result = mvc.perform(get("/Storage/SpecificationService/getUnit").param("unitId", mockDataPool.users.get(0).units.get(0).id).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertNull(result.andReturn().getResolvedException());
+        unitInDB = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), Unit.class);
+        Assert.assertNotNull(unitInDB);
+        Assert.assertNotNull(unitInDB.unitSettings);
+        Assert.assertEquals(1, unitInDB.unitSettings.size());
+        Assert.assertNotNull(unitInDB.rooms);
+        Assert.assertEquals(4, unitInDB.rooms.size());
+        for (Room room : unitInDB.rooms)
+        {
+            Assert.assertNull(room.roomSettings);
+            Assert.assertNull(room.roomMeasurements);
+            Assert.assertNull(room.unit);
+        }
+        Assert.assertNull(unitInDB.unitMeasurements);
+        Assert.assertNull(unitInDB.iterations);
+
+        // 5: Unit exists and has several UnitSettings (only the last should be returned) and several Rooms (each of them has several RoomSettings)
+        genericService.deleteEntireDatabase();
+        mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
+        // test execution and result assertion
+        result = mvc.perform(get("/Storage/SpecificationService/getUnit").param("unitId", mockDataPool.users.get(0).units.get(0).id).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertNull(result.andReturn().getResolvedException());
+        unitInDB = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), Unit.class);
+        Assert.assertNotNull(unitInDB);
+        Assert.assertNotNull(unitInDB.unitSettings);
+        Assert.assertEquals(1, unitInDB.unitSettings.size());
+        Assert.assertNotNull(unitInDB.rooms);
+        Assert.assertEquals(4, unitInDB.rooms.size());
+        for (Room room : unitInDB.rooms)
+        {
+            Assert.assertNotNull(room.roomSettings);
+            Assert.assertEquals(1, room.roomSettings.size());
+            Assert.assertNull(room.roomMeasurements);
+            Assert.assertNull(room.unit);
+        }
+        Assert.assertNull(unitInDB.unitMeasurements);
+        Assert.assertNull(unitInDB.iterations);
+    }
+
+    @Test
+    public void getUnitsTest() throws Exception
+    {
+        Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
+        ResultActions result;
+        Unit unitInDB;
+
+        // 1: No user exists in DB
+        genericService.deleteEntireDatabase();
+        result = mvc.perform(get("/Storage/SpecificationService/getUnits").param("userId", mockDataPool.users.get(0).id).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertNull(result.andReturn().getResolvedException());
+        Assert.assertEquals("[]",result.andReturn().getResponse().getContentAsString());
+
+        // 2: User Exist but has no units
+        genericService.deleteEntireDatabase();
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(get("/Storage/SpecificationService/getUnits").param("userId", mockDataPool.users.get(0).id).contentType(MediaType.TEXT_PLAIN));
+        Assert.assertNull(result.andReturn().getResolvedException());
+        Assert.assertEquals("[]",result.andReturn().getResponse().getContentAsString());
+
+        // 3: User exists with several units
+        genericService.deleteEntireDatabase();
+        Unit newUnit = new Unit();
+        newUnit.id = UUID.randomUUID().toString();
+        newUnit.user = mockDataPool.users.get(0);
+        mockDataPool.users.get(0).units.add(newUnit);
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0)))).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(1)))).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(get("/Storage/SpecificationService/getUnits").param("userId", mockDataPool.users.get(0).id).contentType(MediaType.TEXT_PLAIN));
+        List<Unit> units = new ArrayList<>();
+        units = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), units.getClass());
+        Assert.assertNotNull(units);
+        Assert.assertEquals(2, units.size());
+    }
 
     private static String asJsonString(final Object obj) {
         try {

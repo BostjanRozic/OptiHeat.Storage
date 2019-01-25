@@ -8,6 +8,8 @@ import optiheat.storage.service.SpecificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class SpecificationServiceController
 {
@@ -57,13 +59,15 @@ public class SpecificationServiceController
     public Unit getUnit(@RequestParam("unitId") String unitId)
     {
         Unit unit = specificationService.getUnit(unitId);
-        return ObjectFactory.createDirectedGraph(unit);
+        if (unit != null)
+            unit = ObjectFactory.createDirectedGraph(unit);
+        return unit;
     }
 
-    @RequestMapping(value = "/Storage/SpecificationService/getRoom", method = RequestMethod.GET)
+    @RequestMapping(value = "/Storage/SpecificationService/getUnits", method = RequestMethod.GET)
     @ResponseBody
-    public Room getRoom(@RequestParam("roomId") String roomId)
+    public List<Unit> getUnits(@RequestParam("userId") String userId)
     {
-        return specificationService.getRoom(roomId);
+        return specificationService.getUnits(userId);
     }
 }

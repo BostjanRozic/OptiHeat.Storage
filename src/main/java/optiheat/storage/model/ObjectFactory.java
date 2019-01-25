@@ -10,26 +10,36 @@ public class ObjectFactory
      */
     public static Unit createDirectedGraph(Unit unit)
     {
-        unit.user.units = null;
-        for (Room room : unit.rooms)
+        if (unit.user != null)
+            unit.user.units = null;
+        if (unit.rooms != null)
         {
-            room.unit = null;
-            if (room.roomMeasurements != null)
+            for (Room room : unit.rooms)
             {
-                for (RoomMeasurement rm : room.roomMeasurements)
+                room.unit = null;
+                if (room.roomMeasurements != null)
                 {
-                    rm.iteration.roomMeasurements = null;
-                    rm.iteration.unit = null;
-                    rm.room = null;
+                    for (RoomMeasurement rm : room.roomMeasurements)
+                    {
+                        if (rm.iteration != null)
+                        {
+                            rm.iteration.roomMeasurements = null;
+                            rm.iteration.unit = null;
+                        }
+                        rm.room = null;
+                    }
                 }
-            }
-            if (room.roomSettings != null)
-            {
-                for (RoomSetting rs : room.roomSettings)
+                if (room.roomSettings != null)
                 {
-                    rs.iteration.roomSettings = null;
-                    rs.iteration.unit = null;
-                    rs.room = null;
+                    for (RoomSetting rs : room.roomSettings)
+                    {
+                        if (rs.iteration != null)
+                        {
+                            rs.iteration.roomSettings = null;
+                            rs.iteration.unit = null;
+                        }
+                        rs.room = null;
+                    }
                 }
             }
         }
@@ -37,8 +47,11 @@ public class ObjectFactory
         {
             for (UnitMeasurement um : unit.unitMeasurements)
             {
-                um.iteration.unitMeasurement = null;
-                um.iteration.unit = null;
+                if (um.iteration != null)
+                {
+                    um.iteration.unitMeasurement = null;
+                    um.iteration.unit = null;
+                }
                 um.unit = null;
             }
         }
@@ -46,8 +59,11 @@ public class ObjectFactory
         {
             for (UnitSetting us : unit.unitSettings)
             {
-                us.iteration.unitSetting = null;
-                us.iteration.unit = null;
+                if (us.iteration != null)
+                {
+                    us.iteration.unitSetting = null;
+                    us.iteration.unit = null;
+                }
                 us.unit = null;
             }
         }

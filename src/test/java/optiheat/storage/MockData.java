@@ -49,21 +49,28 @@ public class MockData
         newUnit.name = unit.name;
         newUnit.user = new User();
         newUnit.user.id = unit.user.id;
-        newUnit.unitSettings = new ArrayList<>();
-        UnitSetting newUs = new UnitSetting();
-        newUs.id = unit.unitSettings.get(0).id;
-        newUs.t_max = unit.unitSettings.get(0).t_max;
-        newUs.t_min = unit.unitSettings.get(0).t_min;
-        newUs.iteration = new Iteration();
-        newUs.iteration.id = unit.unitSettings.get(0).iteration.id;
-        newUs.iteration.sequence = unit.unitSettings.get(0).iteration.sequence;
-        newUs.iteration.datetime = unit.unitSettings.get(0).iteration.datetime;
-        newUnit.unitSettings.add(newUs);
-        newUnit.rooms = new ArrayList<>();
-        for (Room room : unit.rooms)
+        if (unit.unitSettings != null)
         {
-            newUnit.rooms.add(copyRoomDirected(room));
+            newUnit.unitSettings = new ArrayList<>();
+            for (UnitSetting us : unit.unitSettings)
+            {
+                UnitSetting newUs = new UnitSetting();
+                newUs.id = us.id;
+                newUs.t_max = us.t_max;
+                newUs.t_min = us.t_min;
+                newUs.iteration = new Iteration();
+                newUs.iteration.id = us.iteration.id;
+                newUs.iteration.sequence = us.iteration.sequence;
+                newUs.iteration.datetime = us.iteration.datetime;
+                newUnit.rooms = new ArrayList<>();
+                for (Room room : unit.rooms)
+                {
+                    newUnit.rooms.add(copyRoomDirected(room));
+                }
+                newUnit.unitSettings.add(newUs);
+            }
         }
+
 
         return newUnit;
     }
@@ -75,17 +82,22 @@ public class MockData
         newRoom.name = room.name;
         newRoom.unit = new Unit();
         newRoom.unit.id = room.unit.id;
-        newRoom.roomSettings = new ArrayList<>();
-        RoomSetting rs = room.roomSettings.get(0);
-        RoomSetting newRs = new RoomSetting();
-        newRs.id = rs.id;
-        newRs.t_Setpoint = rs.t_Setpoint;
-        newRs.valveLevel = rs.valveLevel;
-        newRs.iteration = new Iteration();
-        newRs.iteration.id = rs.iteration.id;
-        newRs.iteration.datetime = rs.iteration.datetime;
-        newRs.iteration.sequence = rs.iteration.sequence;
-        newRoom.roomSettings.add(newRs);
+        if (room.roomSettings != null)
+        {
+            newRoom.roomSettings = new ArrayList<>();
+            for (RoomSetting rs : room.roomSettings)
+            {
+                RoomSetting newRs = new RoomSetting();
+                newRs.id = rs.id;
+                newRs.t_Setpoint = rs.t_Setpoint;
+                newRs.valveLevel = rs.valveLevel;
+                newRs.iteration = new Iteration();
+                newRs.iteration.id = rs.iteration.id;
+                newRs.iteration.datetime = rs.iteration.datetime;
+                newRs.iteration.sequence = rs.iteration.sequence;
+                newRoom.roomSettings.add(newRs);
+            }
+        }
 
         return newRoom;
     }

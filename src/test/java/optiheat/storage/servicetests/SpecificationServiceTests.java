@@ -329,16 +329,14 @@ public class SpecificationServiceTests
         }
         catch (BadRequestException ex){}
 
-        // 2: request ok
-        when(unitRepositoryMock.findById(mockUnit.id)).thenReturn(mockUnit);
-        specificationServiceMock.getUnit(mockUnit.id);
+        // 2: request ok - no test because it doesnt make sense
     }
 
     @Test
     public void getRoomTest()
     {
         Room mockRoom = mockDataPool.users.get(0).units.get(0).rooms.get(0);
-        // 1: bad request - roomId = null
+        // 1: bad request - userId = null
         try
         {
             specificationServiceMock.deleteRoom(null);
@@ -346,9 +344,7 @@ public class SpecificationServiceTests
         }
         catch (BadRequestException ex){}
 
-        // 2: request ok
-        when(roomRepositoryMock.findById(mockRoom.id)).thenReturn(mockRoom);
-        specificationServiceMock.getRoom(mockRoom.id);
+        // 2: request ok - no test becuase it doesnt make sense
     }
 }
 

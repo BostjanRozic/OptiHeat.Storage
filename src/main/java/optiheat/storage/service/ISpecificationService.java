@@ -3,6 +3,8 @@ package optiheat.storage.service;
 import optiheat.storage.model.Room;
 import optiheat.storage.model.Unit;
 
+import java.util.List;
+
 public interface ISpecificationService
 {
     void createUnit(String userId, Unit unit);
@@ -12,5 +14,5 @@ public interface ISpecificationService
     void deleteUnit(String unitId);
     void deleteRoom(String roomId);
     Unit getUnit(String unitId);
-    Room getRoom(String roomId);
+    List<Unit> getUnits(String userId);
 }
