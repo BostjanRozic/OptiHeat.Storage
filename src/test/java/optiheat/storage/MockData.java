@@ -115,6 +115,61 @@ public class MockData
         return newRoom;
     }
 
+    public static Iteration copyIterationDirected(Iteration iteration)
+    {
+        Iteration newIteration = new Iteration();
+        newIteration.id = iteration.id;
+        newIteration.datetime = iteration.datetime;
+        newIteration.sequence = iteration.sequence;
+        newIteration.unit = new Unit();
+        newIteration.unit.id = iteration.unit.id;
+        if (iteration.roomSettings != null)
+        {
+            newIteration.roomSettings = new ArrayList<>();
+            for (RoomSetting roomSetting : iteration.roomSettings)
+            {
+                RoomSetting newRoomSetting = new RoomSetting();
+                newRoomSetting.id = roomSetting.id;
+                newRoomSetting.valveLevel = roomSetting.valveLevel;
+                newRoomSetting.t_Setpoint = roomSetting.t_Setpoint;
+                newRoomSetting.room = new Room();
+                newRoomSetting.room.id = roomSetting.room.id;
+                newIteration.roomSettings.add(newRoomSetting);
+            }
+        }
+        if (iteration.roomMeasurements != null)
+        {
+            newIteration.roomMeasurements = new ArrayList<>();
+            for (RoomMeasurement roomMeasurement : iteration.roomMeasurements)
+            {
+                RoomMeasurement newRoomMeasurement = new RoomMeasurement();
+                newRoomMeasurement.id = roomMeasurement.id;
+                newRoomMeasurement.t = roomMeasurement.t;
+                newRoomMeasurement.room = new Room();
+                newRoomMeasurement.room.id = roomMeasurement.room.id;
+                newIteration.roomMeasurements.add(newRoomMeasurement);
+            }
+        }
+        if (iteration.unitSetting != null)
+        {
+            UnitSetting newUnitSetting = new UnitSetting();
+            newUnitSetting.id = iteration.unitSetting.id;
+            newUnitSetting.t_min = iteration.unitSetting.t_min;
+            newUnitSetting.t_max = iteration.unitSetting.t_max;
+            newIteration.unitSetting = newUnitSetting;
+        }
+        if (iteration.unitMeasurement != null)
+        {
+            UnitMeasurement newUnitMeasurement = new UnitMeasurement();
+            newUnitMeasurement.id = iteration.unitMeasurement.id;
+            newUnitMeasurement.t_Heat = iteration.unitMeasurement.t_Heat;
+            newUnitMeasurement.t_Out = iteration.unitMeasurement.t_Out;
+            newIteration.unitMeasurement = newUnitMeasurement;
+        }
+
+        return newIteration;
+    }
+
     public static User getUser(String userId)
     {
         return users.stream().filter(x -> x.id.equals(userId)).findFirst().get();

@@ -2,8 +2,12 @@ package optiheat.storage.service;
 
 import optiheat.storage.controller.exception.BadRequestException;
 import optiheat.storage.model.Iteration;
+import optiheat.storage.model.RoomMeasurement;
+import optiheat.storage.model.RoomSetting;
 import optiheat.storage.model.UnitMeasurement;
 import optiheat.storage.repository.IterationRepository;
+import optiheat.storage.repository.RoomMeasurementRepository;
+import optiheat.storage.repository.RoomSettingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +21,10 @@ public class DWHService implements IDWHService
     private IterationRepository iterationRepository;
 
     @Autowired
-    private UnitMeasurementRepository unitMeasurementRepository;
+    private RoomSettingRepository roomSettingRepository;
 
-
+    @Autowired
+    private RoomMeasurementRepository roomMeasurementRepository;
 
     @Transactional
     public void createIteration(Iteration iteration)
@@ -45,8 +50,17 @@ public class DWHService implements IDWHService
                 if (iteration.id != null)
                     continue;
                 iteration = iterationRepository.findById(iteration.id);
-
+                for (RoomMeasurement roomMeasurement : iteration.roomMeasurements)
+                {
+                    roomMeasurement = roomMeasurementRepository.findById(roomMeasurement.id);
+                }
+                for (RoomSetting roomSetting : iteration.roomSettings)
+                {
+                    roomSetting = roomSettingRepository.findById(roomSetting.id);
+                }
             }
         }
+
+        return iterations;
     }
 }
