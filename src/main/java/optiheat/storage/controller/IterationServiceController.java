@@ -3,10 +3,7 @@ package optiheat.storage.controller;
 import optiheat.storage.model.Iteration;
 import optiheat.storage.service.DWHService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class IterationServiceController
@@ -18,5 +15,15 @@ public class IterationServiceController
     public void createIteration(@RequestBody Iteration iteration) throws Exception
     {
         DWHService.createIteration(iteration);
+    }
+
+    @RequestMapping(value = "/Storage/DWHServiceService/getIteration", method = RequestMethod.GET)
+    @ResponseBody
+    public Iteration getUnit(@RequestParam("unitId") String unitId)
+    {
+        Iteration iteration =
+        if (unit != null)
+            unit = ObjectFactory.createDirectedGraph(unit);
+        return unit;
     }
 }
