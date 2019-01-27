@@ -69,4 +69,56 @@ public class ObjectFactory
         }
         return unit;
     }
+
+    public static Iteration createDirectedGraph(Iteration iteration)
+    {
+        if (iteration.unit != null)
+        {
+            iteration.unit.iterations = null;
+            iteration.unit.name = null;
+            iteration.unit.user = null;
+            iteration.unit.unitSettings = null;
+            iteration.unit.unitMeasurements = null;
+            iteration.unit.rooms = null;
+        }
+        if (iteration.unitMeasurement != null)
+        {
+            iteration.unitMeasurement.iteration = null;
+            iteration.unitMeasurement.unit = null;
+        }
+        if (iteration.unitSetting != null)
+        {
+            iteration.unitSetting.iteration = null;
+            iteration.unitSetting.unit = null;
+        }
+        if (iteration.roomSettings != null)
+        {
+            for (RoomSetting rs : iteration.roomSettings)
+            {
+                rs.iteration = null;
+                if (rs.room != null)
+                {
+                    rs.room.name = null;
+                    rs.room.roomSettings = null;
+                    rs.room.roomMeasurements = null;
+                    rs.room.unit = null;
+                }
+            }
+        }
+        if (iteration.roomMeasurements != null)
+        {
+            for (RoomMeasurement rm : iteration.roomMeasurements)
+            {
+                rm.iteration = null;
+                if (rm.room != null)
+                {
+                    rm.room.name = null;
+                    rm.room.roomSettings = null;
+                    rm.room.roomMeasurements = null;
+                    rm.room.unit = null;
+                }
+            }
+        }
+        return iteration;
+    }
 }

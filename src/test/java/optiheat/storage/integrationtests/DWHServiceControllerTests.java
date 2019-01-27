@@ -1,6 +1,7 @@
 package optiheat.storage.integrationtests;
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import optiheat.storage.MockData;
 import optiheat.storage.controller.exception.ConflictException;
@@ -90,11 +91,14 @@ public class DWHServiceControllerTests
     @Test
     public void createIterationTest() throws Exception
     {
+        // data prepatartion
         ResultActions result;
         Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
         List<Iteration> mockIterations = mockDataPool.users.get(0).units.get(0).iterations;
         mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
         mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
+
+        // testing iteration insertion
         for (Iteration mockIteration : mockIterations.stream().collect(Collectors.toList()))
         {
             Iteration mockIterationDirected = mockDataPool.copyIterationDirected(mockIteration);
@@ -103,6 +107,28 @@ public class DWHServiceControllerTests
             Iteration iterationInDB = iterationRepository.findById(mockIteration.id);
             assertNotNull(iterationInDB);
         }
+    }
+
+    @Test
+    public void getIterationsTest() throws Exception
+    {
+        // data preparation
+        ResultActions result;
+        Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
+        List<Iteration> mockIterations = mockDataPool.users.get(0).units.get(0).iterations;
+        mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
+        mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
+        for (Iteration mockIteration : mockIterations.stream().collect(Collectors.toList()))
+        {
+            Iteration mockIterationDirected = mockDataPool.copyIterationDirected(mockIteration);
+            mvc.perform(post("/Storage/DWHService/createIteration").content(asJsonString(mockIterationDirected)).contentType(MediaType.APPLICATION_JSON));
+        }
+
+        // testing iterations query
+        result = mvc.perform(get("/Storage/DWHService/getIterations").param("unitId", mockUnit.id).contentType(MediaType.TEXT_PLAIN));
+        assertNull(result.andReturn().getResolvedException());
+        List<Iteration> iterationsInDB = new ArrayList<>();
+        iterationsInDB = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), new TypeReference<List<Iteration>>(){});
     }
 
     @Test

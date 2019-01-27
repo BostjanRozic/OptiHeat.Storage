@@ -1,14 +1,16 @@
 package optiheat.storage.controller;
 
 import optiheat.storage.model.Iteration;
+import optiheat.storage.model.ObjectFactory;
 import optiheat.storage.service.DWHService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class IterationServiceController
+public class DWHServiceController
 {
     @Autowired
     DWHService DWHService;
@@ -19,14 +21,19 @@ public class IterationServiceController
         DWHService.createIteration(iteration);
     }
 
-    @RequestMapping(value = "/Storage/DWHServiceService/getIteration", method = RequestMethod.GET)
+    @RequestMapping(value = "/Storage/DWHService/getIterations", method = RequestMethod.GET)
     @ResponseBody
     public List<Iteration> getIterations(@RequestParam("unitId") String unitId)
     {
-        return DWHService.getIterations(unitId);
-        /*Iteration iteration =
-        if (unit != null)
-            unit = ObjectFactory.createDirectedGraph(unit);
-        return unit;*/
+        List<Iteration> iterations = DWHService.getIterations(unitId);
+        if (iterations == null)
+            return null;
+        List<Iteration> rtnIterations = new ArrayList<>();
+        for (Iteration iteration : iterations)
+        {
+            Iteration directedIteration = ObjectFactory.createDirectedGraph(iteration);
+            rtnIterations.add(directedIteration);
+        }
+        return rtnIterations;
     }
 }
