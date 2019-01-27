@@ -9,6 +9,7 @@ import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MockData
 {
@@ -49,11 +50,33 @@ public class MockData
         newUnit.name = unit.name;
         newUnit.user = new User();
         newUnit.user.id = unit.user.id;
+
+        Iteration newIteration = new Iteration();
+        newIteration.id = UUID.randomUUID().toString();
+        if (unit.iterations != null && !unit.iterations.isEmpty())
+        {
+            newIteration.datetime = unit.iterations.get(0).datetime;
+        }
+
+        boolean roomSettingsPresent = false;
+        if (unit.rooms != null)
+        {
+            Optional<Room> roomsWithSettings = unit.rooms.stream().filter(x -> x.roomSettings != null && !x.roomSettings.isEmpty()).findAny();
+            if (roomsWithSettings.isPresent())
+                roomSettingsPresent = true;
+        }
+        if ((unit.unitSettings != null && !unit.unitSettings.isEmpty()) || roomSettingsPresent)
+        {
+            newUnit.iterations = new ArrayList<>();
+            newUnit.iterations.add(newIteration);
+        }
+
         if (unit.unitSettings != null)
         {
             newUnit.unitSettings = new ArrayList<>();
-            for (UnitSetting us : unit.unitSettings)
-            {
+            //for (UnitSetting us : unit.unitSettings)
+            //{
+            UnitSetting us = unit.unitSettings.get(0);
                 UnitSetting newUs = new UnitSetting();
                 newUs.id = us.id;
                 newUs.t_max = us.t_max;
@@ -65,12 +88,12 @@ public class MockData
                 newUnit.rooms = new ArrayList<>();
                 for (Room room : unit.rooms)
                 {
-                    newUnit.rooms.add(copyRoomDirected(room));
+                    newUnit.rooms.add(copyRoomDirected(room, newIteration));
                 }
                 newUnit.unitSettings.add(newUs);
-            }
+            //}
         }
-        if (unit.iterations != null)
+        /*if (unit.iterations != null)
         {
             List<Iteration> newIterations = new ArrayList<>();
             for (Iteration iteration : unit.iterations)
@@ -82,14 +105,23 @@ public class MockData
                 newIterations.add(newIteration);
             }
             newUnit.iterations = newIterations;
-        }
+        }*/
 
 
         return newUnit;
     }
 
-    public static Room copyRoomDirected(Room room)
+    public static Room copyRoomDirected(Room room, Iteration iteration)
     {
+        if (iteration == null)
+        {
+            iteration = new Iteration();
+            iteration.id = UUID.randomUUID().toString();
+            if (room.roomSettings != null && room.roomSettings.get(0).iteration != null)
+            {
+                iteration.datetime = room.roomSettings.get(0).iteration.datetime;
+            }
+        }
         Room newRoom = new Room();
         newRoom.id = room.id;
         newRoom.name = room.name;
@@ -98,18 +130,19 @@ public class MockData
         if (room.roomSettings != null)
         {
             newRoom.roomSettings = new ArrayList<>();
-            for (RoomSetting rs : room.roomSettings)
-            {
+            RoomSetting rs = room.roomSettings.get(0);
+            //for (RoomSetting rs : room.roomSettings)
+            //{
                 RoomSetting newRs = new RoomSetting();
                 newRs.id = rs.id;
                 newRs.t_Setpoint = rs.t_Setpoint;
                 newRs.valveLevel = rs.valveLevel;
                 newRs.iteration = new Iteration();
-                newRs.iteration.id = rs.iteration.id;
-                newRs.iteration.datetime = rs.iteration.datetime;
-                newRs.iteration.sequence = rs.iteration.sequence;
+                newRs.iteration.id = iteration.id;
+                newRs.iteration.datetime = iteration.datetime;
+                newRs.iteration.sequence = iteration.sequence;
                 newRoom.roomSettings.add(newRs);
-            }
+            //}
         }
 
         return newRoom;

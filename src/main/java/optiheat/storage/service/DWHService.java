@@ -27,13 +27,23 @@ public class DWHService implements IDWHService
     private RoomMeasurementRepository roomMeasurementRepository;
 
     @Transactional
-    public void createIteration(Iteration iteration)
+    public int createIteration(Iteration iteration)
     {
         // payload validation
         if (iteration == null || iteration.unit == null || iteration.unit.id == null)
             throw new BadRequestException("Invalid payload. One of the input arguments is null or missing attributes");
 
+        Iteration latestIteration = iterationRepository.findLatestIterationForUnit(iteration.unit.id);
+        if (latestIteration == null)
+        {
+            iteration.sequence = 0;
+        }
+        else
+        {
+            iteration.sequence = latestIteration.sequence + 1;
+        }
         iterationRepository.save(iteration);
+        return iteration.sequence;
     }
 
     public List<Iteration> getIterations(String unitId)
@@ -43,7 +53,7 @@ public class DWHService implements IDWHService
             throw new BadRequestException("Invalid payload. One of the input arguments is null or missing attributes");
 
         List<Iteration> iterations = iterationRepository.findIterationsForUnit(unitId);
-        if (iterations != null)
+        /*if (iterations != null)
         {
             for (Iteration iteration : iterations)
             {
@@ -59,7 +69,7 @@ public class DWHService implements IDWHService
                     roomSetting = roomSettingRepository.findById(roomSetting.id);
                 }
             }
-        }
+        }*/
 
         return iterations;
     }

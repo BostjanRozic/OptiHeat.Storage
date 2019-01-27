@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 
@@ -99,6 +99,7 @@ public class DWHServiceControllerTests
         mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
 
         // testing iteration insertion
+        int i = 1;  // starting with 1 since one iteration is already in DB
         for (Iteration mockIteration : mockIterations.stream().collect(Collectors.toList()))
         {
             Iteration mockIterationDirected = mockDataPool.copyIterationDirected(mockIteration);
@@ -106,6 +107,10 @@ public class DWHServiceControllerTests
             assertNull(result.andReturn().getResolvedException());
             Iteration iterationInDB = iterationRepository.findById(mockIteration.id);
             assertNotNull(iterationInDB);
+            // check that sequence is incremented and that this increment was returned as a response to operation call
+            assertEquals(i, iterationInDB.sequence);
+            assertEquals(i, Integer.parseInt(result.andReturn().getResponse().getContentAsString()));
+            i++;
         }
     }
 
@@ -129,38 +134,8 @@ public class DWHServiceControllerTests
         assertNull(result.andReturn().getResolvedException());
         List<Iteration> iterationsInDB = new ArrayList<>();
         iterationsInDB = new ObjectMapper().readValue(result.andReturn().getResponse().getContentAsString(), new TypeReference<List<Iteration>>(){});
-    }
-
-    @Test
-    public void createUnitTest() throws Exception
-    {
-        Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
-        List<UnitSetting> allUnitSettings = mockUnit.unitSettings;
-        mockUnit.unitSettings = new ArrayList<>();
-        mockUnit.unitSettings.add(allUnitSettings.get(0));
-        for (Room room : mockUnit.rooms)
-        {
-            List<RoomSetting> allRoomSettings = room.roomSettings;
-            room.roomSettings = new ArrayList<>();
-            room.roomSettings.add(allRoomSettings.get(0));
-        }
-
-        // 1: not found - user does not exist
-        ResultActions result = mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
-        assertNotNull(result.andReturn().getResolvedException());
-        Assert.assertEquals(NotFoundException.class, result.andReturn().getResolvedException().getClass());
-
-        // 3: request ok - unit is entered into db
-        result = mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
-        result = mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
-        assertNull(result.andReturn().getResolvedException());
-        Unit unitInDB = unitRepository.findById(mockUnit.id);
-        Assert.assertEquals(mockUnit.id, unitInDB.id);
-
-        // 3: conflict - unit already exists
-        result = mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
-        assertNotNull(result.andReturn().getResolvedException());
-        Assert.assertEquals(ConflictException.class, result.andReturn().getResolvedException().getClass());
+        assertNotNull(iterationsInDB);
+        assertTrue(!iterationsInDB.isEmpty());
     }
 
     private static String asJsonString(final Object obj) {

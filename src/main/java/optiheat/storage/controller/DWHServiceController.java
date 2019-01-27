@@ -16,9 +16,9 @@ public class DWHServiceController
     DWHService DWHService;
 
     @RequestMapping(value = "/Storage/DWHService/createIteration", method = RequestMethod.POST)
-    public void createIteration(@RequestBody Iteration iteration) throws Exception
+    public int createIteration(@RequestBody Iteration iteration) throws Exception
     {
-        DWHService.createIteration(iteration);
+        return DWHService.createIteration(iteration);
     }
 
     @RequestMapping(value = "/Storage/DWHService/getIterations", method = RequestMethod.GET)

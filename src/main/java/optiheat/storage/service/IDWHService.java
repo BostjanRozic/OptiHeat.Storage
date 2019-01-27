@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface IDWHService
 {
-    void createIteration(Iteration iteration);
+    int createIteration(Iteration iteration);
     List<Iteration> getIterations(String unitId);
 }

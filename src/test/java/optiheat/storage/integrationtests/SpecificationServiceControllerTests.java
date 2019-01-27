@@ -115,7 +115,7 @@ public class SpecificationServiceControllerTests
     @Test
     public void createRoomTest() throws Exception
     {
-        Room mockRoom = mockDataPool.copyRoomDirected(mockDataPool.users.get(0).units.get(0).rooms.get(0));
+        Room mockRoom = mockDataPool.copyRoomDirected(mockDataPool.users.get(0).units.get(0).rooms.get(0), null);
         Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
         ResultActions result;
         // Bad requests are not tested - Service tests are for that...
@@ -175,7 +175,7 @@ public class SpecificationServiceControllerTests
     @Test
     public void updateRoomTest() throws Exception
     {
-        Room mockRoom = mockDataPool.copyRoomDirected(mockDataPool.users.get(0).units.get(0).rooms.get(0));
+        Room mockRoom = mockDataPool.copyRoomDirected(mockDataPool.users.get(0).units.get(0).rooms.get(0), null);
         Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
         Room updatedRoom = new Room();
         updatedRoom.id = mockRoom.id;
@@ -227,7 +227,7 @@ public class SpecificationServiceControllerTests
     @Test
     public void deleteRoomTest() throws Exception
     {
-        Room mockRoom = mockDataPool.copyRoomDirected(mockDataPool.users.get(0).units.get(0).rooms.get(0));
+        Room mockRoom = mockDataPool.copyRoomDirected(mockDataPool.users.get(0).units.get(0).rooms.get(0), null);
         Unit mockUnit = mockDataPool.copyUnitDirected(mockDataPool.users.get(0).units.get(0));
         ResultActions result;
 
