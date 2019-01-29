@@ -28,6 +28,8 @@ public class UserServiceController
     @ResponseBody
     public User getUser(@RequestParam("userId") String userId)
     {
-        return userService.getUser(userId);
+        User user = userService.getUser(userId);
+        user.units = null;
+        return user;
     }
 }
