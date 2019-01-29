@@ -28,13 +28,13 @@ public class SpecificationServiceController
         specificationService.createRoom(room);
     }
 
-    @RequestMapping(value = "/Storage/SpecificationService/updateUnit", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/Storage/SpecificationService/updateUnit", method = RequestMethod.PUT)
     public void updateUnit(@RequestBody Unit unit)
     {
         specificationService.updateUnit(unit);
     }
 
-    @RequestMapping(value = "/Storage/SpecificationService/updateRoom", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/Storage/SpecificationService/updateRoom", method = RequestMethod.PUT)
     public void updateRoom(@RequestBody Room room)
     {
         specificationService.updateRoom(room);
