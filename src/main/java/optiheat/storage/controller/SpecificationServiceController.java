@@ -8,6 +8,7 @@ import optiheat.storage.service.SpecificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -68,6 +69,16 @@ public class SpecificationServiceController
     @ResponseBody
     public List<Unit> getUnits(@RequestParam("userId") String userId)
     {
-        return specificationService.getUnits(userId);
+        List<Unit> directedUnits = null;
+        List<Unit> units = specificationService.getUnits(userId);
+        if (units != null)
+        {
+            directedUnits = new ArrayList<>();
+            for(Unit unit : units)
+            {
+                directedUnits.add(ObjectFactory.createDirectedGraph(unit));
+            }
+        }
+        return directedUnits;
     }
 }
