@@ -158,7 +158,7 @@ public class SpecificationServiceControllerTests
         // 1: not found - unit does not exist
         genericService.deleteEntireDatabase();
         mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
-        result = mvc.perform(patch("/Storage/SpecificationService/updateUnit").content(asJsonString(updatedUnit)).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(put("/Storage/SpecificationService/updateUnit").content(asJsonString(updatedUnit)).contentType(MediaType.APPLICATION_JSON));
         Assert.assertNotNull(result.andReturn().getResolvedException());
         Assert.assertEquals(NotFoundException.class, result.andReturn().getResolvedException().getClass());
 
@@ -166,7 +166,7 @@ public class SpecificationServiceControllerTests
         genericService.deleteEntireDatabase();
         mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
         mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
-        result = mvc.perform(patch("/Storage/SpecificationService/updateUnit").content(asJsonString(updatedUnit)).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(put("/Storage/SpecificationService/updateUnit").content(asJsonString(updatedUnit)).contentType(MediaType.APPLICATION_JSON));
         Assert.assertNull(result.andReturn().getResolvedException());
         Unit unitInDB = unitRepository.findById(mockUnit.id);
         Assert.assertEquals("nov naziv", unitInDB.name);
@@ -185,7 +185,7 @@ public class SpecificationServiceControllerTests
         // 1: not found - room does not exist
         genericService.deleteEntireDatabase();
         mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
-        result = mvc.perform(patch("/Storage/SpecificationService/updateRoom").content(asJsonString(updatedRoom)).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(put("/Storage/SpecificationService/updateRoom").content(asJsonString(updatedRoom)).contentType(MediaType.APPLICATION_JSON));
         Assert.assertNotNull(result.andReturn().getResolvedException());
         Assert.assertEquals(NotFoundException.class, result.andReturn().getResolvedException().getClass());
 
@@ -193,7 +193,7 @@ public class SpecificationServiceControllerTests
         genericService.deleteEntireDatabase();
         mvc.perform(post("/Storage/UserService/createUser").content(asJsonString(mockUnit.user)).contentType(MediaType.APPLICATION_JSON));
         mvc.perform(post("/Storage/SpecificationService/createUnit").param("userId", mockUnit.user.id).content(asJsonString(mockUnit)).contentType(MediaType.APPLICATION_JSON));
-        result = mvc.perform(patch("/Storage/SpecificationService/updateRoom").content(asJsonString(updatedRoom)).contentType(MediaType.APPLICATION_JSON));
+        result = mvc.perform(put("/Storage/SpecificationService/updateRoom").content(asJsonString(updatedRoom)).contentType(MediaType.APPLICATION_JSON));
         Assert.assertNull(result.andReturn().getResolvedException());
         Room roomInDB = roomRepository.findById(mockRoom.id);
         Assert.assertEquals("nov naziv", roomInDB.name);

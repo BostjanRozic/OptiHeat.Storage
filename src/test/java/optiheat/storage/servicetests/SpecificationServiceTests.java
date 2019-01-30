@@ -49,11 +49,8 @@ public class SpecificationServiceTests
     {
         try
         {
-            if (mockDataPool.users == null || mockDataPool.users.isEmpty())
-            {
-                mockDataPool = new MockData();
-                mockDataPool.populateMockDataFromFiles(UUID.randomUUID().toString());
-            }
+            mockDataPool = new MockData();
+            mockDataPool.populateMockDataFromFiles(UUID.randomUUID().toString());
             //initMocks(this);
         }
         catch (Exception ex)

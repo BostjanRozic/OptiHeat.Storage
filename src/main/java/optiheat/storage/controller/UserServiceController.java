@@ -29,7 +29,8 @@ public class UserServiceController
     public User getUser(@RequestParam("userId") String userId)
     {
         User user = userService.getUser(userId);
-        user.units = null;
+        if (user != null)
+            user.units = null;
         return user;
     }
 }
